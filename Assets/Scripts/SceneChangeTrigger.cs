@@ -1,121 +1,90 @@
 using UnityEngine;
-using FishNet.Object; // Diperlukan untuk NetworkBehaviour
+using FishNet.Object;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Connection;
-using System.Collections; // Diperlukan untuk Coroutine (IEnumerator)
-using UnityEngine.SceneManagement; // Diperlukan untuk mengakses Scene
+using System.Collections.Generic; // Diperlukan untuk List
 
-// PERBAIKAN: Ganti MonoBehaviour menjadi NetworkBehaviour
+// Pastikan skrip ini menempel pada GameObject trigger di scene lobi Anda.
 public class SceneChangeTrigger : NetworkBehaviour
 {
     [Tooltip("Scene yang akan dimuat saat pemain masuk ke trigger ini.")]
     [SerializeField]
-    private string _targetSceneName = "GameScene"; // Pastikan nama ini sama persis dengan nama file scene kedua Anda.
+    private string _targetSceneName = "GameScene";
+
+    [Header("Teleport Settings")]
+    [Tooltip("Tag yang digunakan oleh spawn point di scene tujuan.")]
+    [SerializeField]
+    private string _spawnPointTag = "Respawn";
 
     // Fungsi ini akan berjalan saat ada objek lain yang masuk ke dalam trigger.
     private void OnTriggerEnter(Collider other)
     {
         // 1. Dapatkan komponen NetworkObject dari objek yang masuk.
-        NetworkObject nob = other.GetComponent<NetworkObject>();
+        if (!other.TryGetComponent<NetworkObject>(out NetworkObject nob))
+            return;
 
-        // 2. Jika objek itu adalah objek jaringan DAN kita adalah pemiliknya (ini penting!).
-        if (nob != null && nob.IsOwner)
+        // 2. Pastikan objek tersebut adalah milik client lokal (IsOwner).
+        // Ini mencegah pemain lain memicu trigger untuk Anda.
+        if (nob.IsOwner)
         {
             Debug.Log($"Pemain {nob.Owner.ClientId} masuk ke trigger, meminta pindah ke scene {_targetSceneName}.");
-
-            // 3. Minta server untuk memindahkan scene kita, kirim juga NetworkObject pemain.
-            ServerRequestSceneChange(nob);
+            // 3. Minta server untuk memindahkan scene kita.
+            CmdChangeScene(_targetSceneName);
         }
     }
 
-    // Fungsi ini hanya akan berjalan di server.
+    // Fungsi ini berjalan di server untuk memindahkan satu pemain.
     [ServerRpc(RequireOwnership = false)]
-    private void ServerRequestSceneChange(NetworkObject playerObject, NetworkConnection sender = null)
+    private void CmdChangeScene(string sceneName, NetworkConnection sender = null)
     {
+        if (string.IsNullOrEmpty(sceneName) || sender.Objects.Count == 0) return;
+
+        // --- PERBAIKAN: Ambil nama scene dari GameObject trigger ini, bukan dari objek pemain. ---
+        // Ini jauh lebih andal karena trigger ini pasti berada di scene yang ingin kita unload.
+        string oldSceneName = gameObject.scene.name;
+
         // Siapkan data untuk memuat scene baru.
-        SceneLoadData sld = new SceneLoadData(_targetSceneName);
-        // PENTING: Beritahu FishNet objek mana yang harus ikut pindah ke scene baru.
-        sld.MovedNetworkObjects = new NetworkObject[] { playerObject };
-
-        // Dapatkan scene lama dari objek pemain sebelum dipindahkan.
-        string oldScene = playerObject.gameObject.scene.name;
-
-        // --- LOGIKA BARU UNTUK MENANGANI EVENT SETELAH LOAD SELESAI ---
+        SceneLoadData sld = new SceneLoadData(sceneName);
+        // Pindahkan semua objek milik koneksi ini ke scene baru.
+        sld.MovedNetworkObjects = new NetworkObject[sender.Objects.Count];
+        sender.Objects.CopyTo(sld.MovedNetworkObjects, 0);
 
         // Definisikan Aksi yang akan dijalankan setelah scene selesai dimuat.
         System.Action<SceneLoadEndEventArgs> onLoadEndAction = null;
         onLoadEndAction = (args) =>
         {
-            // 1. Langsung berhenti berlangganan event agar tidak berjalan lagi untuk scene lain.
+            // 1. Berhenti berlangganan event agar tidak berjalan lagi untuk pemain lain.
             InstanceFinder.SceneManager.OnLoadEnd -= onLoadEndAction;
 
-            // 2. Jalankan Coroutine untuk memindahkan pemain ke SpawnPoint.
-            StartCoroutine(MovePlayerToSpawnPoint(playerObject, _targetSceneName));
+            // 2. Cari spawn point di scene yang baru menggunakan tag.
+            GameObject spawnPoint = GameObject.FindWithTag(_spawnPointTag);
+            if (spawnPoint == null)
+            {
+                Debug.LogError($"[Server] Tidak dapat menemukan GameObject dengan tag '{_spawnPointTag}' di scene yang baru.");
+                return;
+            }
 
-            // 3. Setelah semua beres, baru lepas (unload) scene yang lama.
-            SceneUnloadData sud = new SceneUnloadData(oldScene);
+            // 3. Teleportasi HANYA pemain yang baru saja pindah.
+            foreach (NetworkObject movedNob in sender.Objects)
+            {
+                if (movedNob.TryGetComponent(out PlayerTeleporter teleporter))
+                {
+                    Debug.Log($"[Server] Menteleportasi pemain milik ClientId {movedNob.Owner.ClientId}.");
+                    teleporter.RpcTeleport(movedNob.Owner, spawnPoint.transform.position, spawnPoint.transform.rotation);
+                }
+            }
+
+            // 4. Setelah teleportasi selesai, unload scene yang lama untuk koneksi ini.
+            Debug.Log($"[Server] Melepaskan (unloading) scene '{oldSceneName}' untuk ClientId {sender.ClientId}.");
+            SceneUnloadData sud = new SceneUnloadData(oldSceneName);
             InstanceFinder.SceneManager.UnloadConnectionScenes(sender, sud);
         };
 
         // Berlangganan (subscribe) ke event OnLoadEnd.
         InstanceFinder.SceneManager.OnLoadEnd += onLoadEndAction;
 
-        // Jalankan proses load scene untuk koneksi yang bersangkutan.
+        // Jalankan proses load scene HANYA untuk koneksi yang meminta.
         InstanceFinder.SceneManager.LoadConnectionScenes(sender, sld);
-    }
-
-    /// <summary>
-    /// Coroutine yang berjalan di server untuk memindahkan pemain ke SpawnPoint.
-    /// </summary>
-    private IEnumerator MovePlayerToSpawnPoint(NetworkObject playerObject, string sceneName)
-    {
-        // Tunggu satu frame untuk memastikan scene sudah "tenang" dan semua objeknya aktif.
-        yield return new WaitForEndOfFrame();
-
-        if (playerObject == null)
-            yield break;
-
-        // Cari SpawnPoint di scene yang baru dimuat.
-        GameObject spawnPoint = null;
-        Scene targetScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
-        if (targetScene.IsValid())
-        {
-            UnityEngine.SceneManagement.SceneManager.SetActiveScene(targetScene);
-            foreach (GameObject rootObj in targetScene.GetRootGameObjects())
-            {
-                if (rootObj.name == "SpawnPoint")
-                {
-                    spawnPoint = rootObj;
-                    break;
-                }
-            }
-        }
-
-        if (spawnPoint != null)
-        {
-            // Nonaktifkan CharacterController sementara jika ada, untuk menghindari konflik.
-            CharacterController cc = playerObject.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-
-            // Pindahkan posisi dan rotasi pemain.
-            playerObject.transform.position = spawnPoint.transform.position;
-            playerObject.transform.rotation = spawnPoint.transform.rotation;
-
-            PlayerTeleporter teleporter = playerObject.GetComponent<PlayerTeleporter>();
-            if (teleporter != null)
-            {
-                teleporter.RpcTeleport(playerObject.Owner, spawnPoint.transform.position, spawnPoint.transform.rotation);
-            }
-
-            // Aktifkan kembali CharacterController.
-            if (cc != null) cc.enabled = true;
-
-            Debug.Log($"[Server] Pemain {playerObject.Owner.ClientId} berhasil dipindahkan ke SpawnPoint di scene {sceneName}.");
-        }
-        else
-        {
-            Debug.LogWarning($"[Server] Peringatan: SpawnPoint tidak ditemukan di scene '{sceneName}'. Pemain tidak dipindahkan.");
-        }
     }
 }

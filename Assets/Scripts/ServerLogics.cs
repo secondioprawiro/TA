@@ -8,13 +8,11 @@ using FishNet.Transporting;
 
 public class ServerLogics : NetworkBehaviour
 {
-    // Singleton telah dihapus.
 
     [Header("Player Prefabs")]
     [SerializeField]
     private List<GameObject> playerPrefabs = new List<GameObject>();
 
-    // --- PING SYSTEM ---
     [Header("Ping System")]
     [Tooltip("Berapa lama (dalam detik) server akan menunggu sebelum men-disconnect client yang tidak aktif.")]
     [SerializeField] private float _clientTimeout = 20f;

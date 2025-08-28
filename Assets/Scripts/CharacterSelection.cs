@@ -2,11 +2,15 @@ using FishNet.Connection;
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
+using FishNet.Component.Spawning;
 
 public class CharacterSelection : NetworkBehaviour
 {
-    [SerializeField] private GameObject playerPrefab;  // Standard player prefab
-    [SerializeField] private GameObject vrPlayerPrefab; // VR player prefab
+    [SerializeField] private GameObject playerPrefab;    // Standard player prefab
+    [SerializeField] private GameObject vrPlayerPrefab;  // VR player prefab
+
+    // Variabel untuk menyimpan referensi ke PlayerSpawner agar tidak perlu dicari berulang kali.
+    private PlayerSpawner _playerSpawner;
 
     public override void OnStartClient()
     {
@@ -23,24 +27,11 @@ public class CharacterSelection : NetworkBehaviour
     private void SpawnCharacter()
     {
         string deviceModel = SystemInfo.deviceModel;
-        bool isVR = deviceModel.Contains("Pico");
-        GameObject serverObject = GameObject.FindWithTag("Server"); // Ensure the GameObject has the "Server" tag
-        if (serverObject != null)
-        {
-            ServerLogics logics = serverObject.GetComponent<ServerLogics>();
-            if (logics != null)
-            {
+        bool isVR = deviceModel.Contains("Pico");        
 
-                logics.LogdeviceModel(deviceModel);
-
-            }
-            else
-            {
-                Debug.LogError("ServerLogics component not found on the GameObject with 'Server' tag!");
-            }
-        }
         Debug.Log($"Device Model: {deviceModel}. Spawning {(isVR ? "VR" : "standard")} character.");
-        SpawnRequest(isVR ? 1 : 0, LocalConnection);  // Request to spawn the appropriate prefab
+        // Kirim spawnIndex (0 untuk non-VR, 1 untuk VR) ke server.
+        SpawnRequest(isVR ? 1 : 0, LocalConnection);
     }
 
     // Sends a request to the server to spawn a character
@@ -56,22 +47,44 @@ public class CharacterSelection : NetworkBehaviour
             return;
         }
 
-        // Ensure the spawn point exists
-        if (SpawnPoint.instance == null)
+       
+        if (_playerSpawner == null)
         {
-            Debug.LogError("Spawn point is not defined");
+            _playerSpawner = FindObjectOfType<PlayerSpawner>();
+            if (_playerSpawner == null)
+            {
+                Debug.LogError("Tidak dapat menemukan PlayerSpawner di scene!");
+                return;
+            }
+        }
+       
+        if (_playerSpawner.Spawns == null || _playerSpawner.Spawns.Length == 0)
+        {
+            Debug.LogError("Daftar 'Spawns' di PlayerSpawner kosong!");
             return;
         }
+       
+        if (spawnIndex < 0 || spawnIndex >= _playerSpawner.Spawns.Length)
+        {
+            Debug.LogError($"Spawn index {spawnIndex} di luar jangkauan daftar 'Spawns'!");
+            return;
+        }
+        
+        Transform spawnPointTransform = _playerSpawner.Spawns[spawnIndex];
 
-        // Instantiate the player prefab at the designated spawn point
+        if (spawnPointTransform == null)
+        {
+            Debug.LogError($"Spawn point pada index {spawnIndex} adalah null!");
+            return;
+        }
+        
         GameObject playerInstance = Instantiate(
             prefabToSpawn,
-            SpawnPoint.instance.transform.position,
-            quaternion.identity
+            spawnPointTransform.position, 
+            spawnPointTransform.rotation  
         );
 
-        // Spawn the instantiated player on the network
         Spawn(playerInstance, conn);
-        Debug.Log($"Spawned {prefabToSpawn.name} for connection {conn.ClientId}.");
+        Debug.Log($"Spawned {prefabToSpawn.name} for connection {conn.ClientId} at {spawnPointTransform.name}.");
     }
 }
