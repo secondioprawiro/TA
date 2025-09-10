@@ -15,6 +15,8 @@ namespace StarterAssets
 #endif
     public class ThirdPersonControllerNetworked : NetworkBehaviour
     {
+        private bool _isRotationLocked = false;
+
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -59,6 +61,12 @@ namespace StarterAssets
 
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
+
+        [Header("Player Pushing")]
+        [Tooltip("Layer dari objek yang bisa didorong. Harus sama dengan yang ada di script BasicRigidBodyPushNetworked.")]
+        public LayerMask PushLayers;
+        [Tooltip("Jarak aman antara pemain dan objek saat mendorong untuk mencegah clipping.")]
+        public float PushStopDistance = 0.1f;
 
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
@@ -177,6 +185,8 @@ namespace StarterAssets
         private void LateUpdate()
         {
             // Hanya owner yang boleh mengontrol kamera.
+            if (_isRotationLocked) return;
+
             if (base.IsOwner)
             {
                 CameraRotation();
@@ -233,25 +243,19 @@ namespace StarterAssets
 
         private void Move()
         {
-            // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed = (_isRotationLocked || !_input.sprint) ? MoveSpeed : SprintSpeed;
 
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-            // a reference to the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
-            // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
                     Time.deltaTime * SpeedChangeRate);
-
-                // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
             }
             else
@@ -262,30 +266,50 @@ namespace StarterAssets
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
-            // normalise input direction
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 targetDirection;
 
-            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                    RotationSmoothTime);
+                if (_isRotationLocked)
+                {
+                    // LOGIKA BARU 1: Blokir gerakan mundur saat mendorong.
+                    // Ambil hanya input maju (W) dan abaikan input mundur (S).
+                    float forwardInput = Mathf.Max(0f, _input.move.y);
+                    targetDirection = transform.forward * forwardInput;
+                }
+                else
+                {
+                    // Logika rotasi normal saat tidak mendorong
+                    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                      _mainCamera.transform.eulerAngles.y;
+                    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                        RotationSmoothTime);
 
-                // rotate to face input direction relative to camera position
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+                }
+            }
+            else
+            {
+                targetDirection = Vector3.zero;
             }
 
+            // LOGIKA BARU 2: Cek jarak sebelum bergerak untuk mencegah clipping.
+            if (_isRotationLocked && targetDirection.magnitude > 0)
+            {
+                // Cek apakah ada objek pendorong tepat di depan dalam jarak aman.
+                if (Physics.Raycast(transform.position + _controller.center, transform.forward, out RaycastHit hit, _controller.radius + PushStopDistance, PushLayers))
+                {
+                    // Jika ada, batalkan semua gerakan maju untuk frame ini agar tidak menembus.
+                    targetDirection = Vector3.zero;
+                    _speed = 0;
+                }
+            }
 
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-            // move the player
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
-            // update animator if using character
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
@@ -407,6 +431,11 @@ namespace StarterAssets
             {
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
+        }
+
+        public void LockRotation(bool isLocked)
+        {
+            _isRotationLocked = isLocked;
         }
     }
 }

@@ -1598,8 +1598,9 @@ MonoBehaviour:
   pushLayers:
     serializedVersion: 2
     m_Bits: 8
-  canPush: 1
   strength: 0.5
+  pushDistance: 1.5
+  thirdPersonController: {fileID: -5666668197102539587}
 --- !u!114 &-4997774572049389369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3320,7 +3321,6 @@ MonoBehaviour:
   _componentIndexCache: 7
   _addedNetworkObject: {fileID: -5681718616853551831}
   _networkObjectCache: {fileID: -5681718616853551831}
-  playerInput: {fileID: 4416926081852918493}
 --- !u!114 &4918747730675055005
 MonoBehaviour:
   m_ObjectHideFlags: 0
