@@ -1,5 +1,6 @@
 using UnityEngine;
 using FishNet.Object;
+using System.Collections;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -16,6 +17,7 @@ namespace StarterAssets
     public class ThirdPersonControllerNetworked : NetworkBehaviour
     {
         private bool _isRotationLocked = false;
+        private Coroutine _alignmentCoroutine;
 
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -67,6 +69,8 @@ namespace StarterAssets
         public LayerMask PushLayers;
         [Tooltip("Jarak aman antara pemain dan objek saat mendorong untuk mencegah clipping.")]
         public float PushStopDistance = 0.1f;
+        public float AlignmentDuration = 0.15f;
+
 
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
@@ -432,6 +436,45 @@ namespace StarterAssets
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
+
+        #region Alignment
+        public void StartAlignment(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            if (_alignmentCoroutine != null) StopCoroutine(_alignmentCoroutine);
+            _alignmentCoroutine = StartCoroutine(AlignToPushTarget(targetPosition, targetRotation));
+        }
+
+        private IEnumerator AlignToPushTarget(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            LockRotation(true); // Kunci rotasi & input
+            _controller.enabled = false; // Nonaktifkan controller untuk memanipulasi transform
+
+            float elapsedTime = 0f;
+            Vector3 startingPos = transform.position;
+            Quaternion startingRot = transform.rotation;
+
+            while (elapsedTime < AlignmentDuration)
+            {
+                // Interpolasi posisi dan rotasi secara mulus
+                transform.position = Vector3.Lerp(startingPos, targetPosition, elapsedTime / AlignmentDuration);
+                transform.rotation = Quaternion.Slerp(startingRot, targetRotation, elapsedTime / AlignmentDuration);
+
+                elapsedTime += Time.deltaTime;
+                yield return null; // Tunggu frame berikutnya
+            }
+
+            // Snap ke posisi akhir untuk memastikan presisi
+            transform.position = targetPosition;
+            transform.rotation = targetRotation;
+
+            _controller.enabled = true; // Aktifkan kembali controller
+        }
+
+        public float GetControllerRadius()
+        {
+            return _controller != null ? _controller.radius : 0.28f;
+        }
+        #endregion
 
         public void LockRotation(bool isLocked)
         {
