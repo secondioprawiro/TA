@@ -1049,7 +1049,7 @@ MonoBehaviour:
   _ipv6BindAddress: 
   _port: 7770
   _maximumClients: 4095
-  _clientAddress: 192.168.1.8
+  _clientAddress: 192.168.0.108
 --- !u!114 &1120203583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ce219ed7601b04b9c69f1281ad3bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionType: 1
+  connectionType: 0
 --- !u!114 &1120203587
 MonoBehaviour:
   m_ObjectHideFlags: 0

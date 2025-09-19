@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI; // Ditambahkan untuk mengakses komponen Button
+using UnityEngine.UI;
 using FishNet.Object;
 using FishNet.Connection;
 using FishNet.Object.Synchronizing;
@@ -26,12 +26,11 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
     private NetworkObject networkObject;
     private Animator _animator;
     private bool _hasAnimator;
-    private bool _canCurrentlyPush = false; 
+    private bool _canCurrentlyPush = false;
 
     private readonly SyncVar<bool> _isPushing = new SyncVar<bool>();
 
     #region Initialization & Deinitialization
-
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -57,7 +56,6 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
             mobilePushButton.onClick.RemoveListener(OnPushInteraction);
         }
     }
-
     #endregion
 
     private void Update()
@@ -78,7 +76,7 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
         {
             mobilePushButton.interactable = _canCurrentlyPush;
         }
- 
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             OnPushInteraction();
@@ -122,7 +120,6 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
         }
     }
 
-    // --- Sisa kode Anda tidak diubah ---
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (!base.IsOwner) return;
@@ -131,54 +128,37 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
             var hitLayerMask = 1 << hit.gameObject.layer;
             if ((hitLayerMask & pushLayers.value) != 0)
             {
+                // DIUBAH: Panggil fungsi PushRigidBodies di sini
                 PushRigidBodies(hit);
             }
         }
     }
 
+    // DIUBAH: Fungsi ini sekarang hanya mengirim permintaan ke server.
     private void PushRigidBodies(ControllerColliderHit hit)
     {
-        Rigidbody body = hit.collider.attachedRigidbody;
-        if (body == null || body.isKinematic) return;
-        var bodyLayerMask = 1 << body.gameObject.layer;
-        if ((bodyLayerMask & pushLayers.value) == 0) return;
-        if (hit.moveDirection.y < -0.3f) return;
+        // Pastikan objek yang ditabrak punya NetworkObject
+        NetworkObject targetNO = hit.collider.GetComponent<NetworkObject>();
+        if (targetNO == null) return;
+
+        // Dapatkan arah dorongan
         Vector3 pushDir = new Vector3(hit.moveDirection.x, 0.0f, hit.moveDirection.z);
-        GameObject selectedObject = hit.collider.gameObject;
-        TransferObjectOwnership(selectedObject);
-        body.AddForce(pushDir * strength, ForceMode.Impulse);
-        RemoveTransferObjectOwnership(selectedObject);
+
+        // Kirim permintaan ke server untuk menerapkan gaya
+        CmdApplyForce(targetNO, pushDir * strength);
     }
 
-    #region Ownership Transfer
-    public void TransferObjectOwnership(GameObject selectedObject) {
-        if (networkObject == null || networkObject.Owner == null) 
-            return; 
+    // BARU: ServerRpc untuk menerapkan gaya di server
+    [ServerRpc]
+    private void CmdApplyForce(NetworkObject targetObject, Vector3 force)
+    {
+        // Pastikan objeknya ada dan memiliki Rigidbody
+        if (targetObject != null && targetObject.TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            // Terapkan gaya di server. NetworkTransform akan menyinkronkan hasilnya.
+            rb.AddForce(force, ForceMode.Impulse);
+        }
+    }
 
-        NetworkObject objectNetworkObject = selectedObject.GetComponent<NetworkObject>(); 
-
-        if (objectNetworkObject != null) { 
-            TransferObjectOwnershipServer(objectNetworkObject, networkObject.Owner); 
-        } 
-    }
-    public void RemoveTransferObjectOwnership(GameObject selectedObject) { 
-        if (networkObject == null || networkObject.Owner == null) 
-            return;
-        
-        NetworkObject ObjectNetworkObject = selectedObject.GetComponent<NetworkObject>(); 
-
-        if (ObjectNetworkObject != null) { 
-            RemoveTransferObjectOwnershipServer(ObjectNetworkObject); 
-        } 
-    }
-    [ServerRpc(RequireOwnership = false)]
-    private void TransferObjectOwnershipServer(NetworkObject targetObject, NetworkConnection newOwner) { 
-        targetObject.GiveOwnership(newOwner); 
-    }
-    [ServerRpc(RequireOwnership = false)]
-    private void RemoveTransferObjectOwnershipServer(NetworkObject targetObject) { 
-        targetObject.RemoveOwnership(); 
-    }
-    #endregion
 }
 
