@@ -1,9 +1,9 @@
 {
-    "m_SelectedDeviceId": "NZAA4TTWJV9LY55L",
+    "m_SelectedDeviceId": "PA8120MGGA261358G",
     "m_SelectedProcess": {
-        "deviceId": "NZAA4TTWJV9LY55L",
+        "deviceId": "PA8120MGGA261358G",
         "name": "com.DefaultCompany.MyProject",
-        "processId": 5246,
+        "processId": 14101,
         "exited": false
     },
     "m_SelectedPriority": 1,
@@ -84,6 +84,36 @@
             "deviceId": "NZAA4TTWJV9LY55L",
             "name": "com.DefaultCompany.MyProject",
             "processId": 5246,
+            "exited": false
+        },
+        {
+            "deviceId": "NZAA4TTWJV9LY55L",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 6064,
+            "exited": false
+        },
+        {
+            "deviceId": "NZAA4TTWJV9LY55L",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 10421,
+            "exited": false
+        },
+        {
+            "deviceId": "NZAA4TTWJV9LY55L",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 4406,
+            "exited": false
+        },
+        {
+            "deviceId": "NZAA4TTWJV9LY55L",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 18891,
+            "exited": false
+        },
+        {
+            "deviceId": "NZAA4TTWJV9LY55L",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 18988,
             "exited": false
         },
         {
@@ -241,6 +271,198 @@
             "name": "com.DefaultCompany.MyProject",
             "processId": 8287,
             "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5493,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5497,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5499,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 9831,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 16753,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 16744,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 16754,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 14529,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 14534,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 16876,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5132,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5151,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5142,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 31272,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 5029,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 6599,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 10763,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 10766,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 28158,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 28172,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 32665,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 32678,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 32683,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 8666,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 8668,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 24225,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 24224,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 28901,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 28905,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 7990,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 14093,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 14101,
+            "exited": false
         }
     ],
     "m_Tags": {
@@ -297,8 +519,8 @@
         "AutoCapture": true
     },
     "m_FilterOptions": {
-        "m_Filter": "",
-        "m_UseRegularExpressions": false,
+        "m_Filter": "^(?!.*OPENGL NATIVE PLUG-IN ERROR: GL_INVALID_OPERATION).* ",
+        "m_UseRegularExpressions": true,
         "m_MatchCase": false
     },
     "m_SymbolPaths": [],
