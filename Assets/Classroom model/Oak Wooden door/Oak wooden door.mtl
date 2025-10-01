@@ -1,0 +1,47 @@
+# 3ds Max Wavefront OBJ Exporter v0.99 - (c)2007 guruware
+# File Created: 22.05.2025 11:32:54
+
+newmtl 01___Default
+	Kd 0.2014 0.2014 1.0000
+	Ks 1.0000 1.0000 1.0000
+	Tr 0.0000
+	d 1.0000
+	Tf 1.0000 1.0000 1.0000
+	Pr 0.2800
+	Pm 0.0000
+	Pc 0.0000
+	Pcr 0.0000
+	Ni 1.4800
+	Ke 0.0000 0.0000 0.0000
+	illum 2
+	map_Kd C:\Users\Marwan\Desktop\3dmax work\Ex.3 - Door\Oak Wooden door\texture\wood.jpg
+
+newmtl 02___Default
+	Kd 0.9140 0.9140 0.9200
+	Ks 1.0000 1.0000 1.0000
+	Tr 0.0000
+	d 1.0000
+	Tf 1.0000 1.0000 1.0000
+	Pr 0.2900
+	Pm 1.0000
+	Pc 0.0000
+	Pcr 0.0000
+	Ni 1.5200
+	Ke 0.0000 0.0000 0.0000
+	illum 2
+	map_Kd C:\Users\Marwan\Desktop\3dmax work\Ex.3 - Door\wooden door\texture\Metals.jpg
+
+newmtl 03
+	Kd 0.9140 0.9140 0.9200
+	Ks 1.0000 1.0000 1.0000
+	Tr 0.0000
+	d 1.0000
+	Tf 1.0000 1.0000 1.0000
+	Pr 0.2900
+	Pm 1.0000
+	Pc 0.0000
+	Pcr 0.0000
+	Ni 1.5200
+	Ke 0.0000 0.0000 0.0000
+	illum 2
+	map_Kd C:\Users\Marwan\Desktop\3dmax work\Ex.3 - Door\Oak Wooden door\texture\metal.jpg

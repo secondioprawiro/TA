@@ -17,6 +17,7 @@ public class InteractiveRigidbody : NetworkBehaviour
     [Header("Referensi UI")]
     [Tooltip("Teks untuk menampilkan massa saat ini.")]
     public TextMeshProUGUI massDisplayText;
+    public TextMeshProUGUI massDisplayText2;
 
     // SyncVar untuk menyinkronkan massa ke semua client.
     private readonly SyncVar<float> _currentMass = new SyncVar<float>();
@@ -59,10 +60,11 @@ public class InteractiveRigidbody : NetworkBehaviour
         _rigidbody.mass = next;
 
         // Perbarui teks di UI.
-        if (massDisplayText != null)
+        if (massDisplayText != null & massDisplayText2 != null)
         {
-            massDisplayText.text = $"Massa objek\nsaat ini\n{next.ToString("F1")} kg"
-;
+            massDisplayText.text = $"Massa objek\nsaat ini\n{next.ToString("F1")} kg";
+            massDisplayText2.text = $"Massa objek\nsaat ini\n{next.ToString("F1")} kg";
+
         }
     }
 
