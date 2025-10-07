@@ -7,6 +7,10 @@ using StarterAssets;
 
 public class BasicRigidBodyPushNetworked : NetworkBehaviour
 {
+
+    [Tooltip("Saklar utama untuk mengizinkan interaksi dorong. Matikan untuk pemain di challenge.")]
+    public bool canPush = true;
+
     [Header("Push Settings")]
     public LayerMask pushLayers;
     [Range(0.5f, 5f)] public float strength = 1.1f;
@@ -108,12 +112,11 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
 
         if (canSeeObject)
         {
-            Debug.Log("Raycast mengenai: " + hit.collider.name);
             InteractiveRigidbody irb = hit.collider.GetComponentInParent<InteractiveRigidbody>();
             _lastSeenRigidbody = hit.collider.GetComponent<InteractiveRigidbody>();
             if (irb != null)
             {
-                Debug.Log("BERHASIL menemukan InteractiveRigidbody!");
+                //do something
             }
             else
             {
@@ -143,6 +146,32 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
 
     public void OnPushInteraction()
     {
+        Debug.Log("OnPushInteraction dipanggil."); // Pesan debug untuk konfirmasi
+
+        // --- LOGIKA KONDISIONAL DIMULAI DI SINI ---
+
+        bool isPracticeObject = false;
+
+        // Cek dulu apakah kita sedang melihat sebuah objek
+        if (_lastSeenRigidbody != null)
+        {
+            // Jika objek yang dilihat punya tag "PracticeObject"...
+            if (_lastSeenRigidbody.gameObject.CompareTag("PracticeObject"))
+            {
+                isPracticeObject = true;
+            }
+        }
+
+        // Aturan utama: Jika objek ini BUKAN objek latihan, maka aturan canPush berlaku.
+        if (!isPracticeObject)
+        {
+            if (!canPush)
+            {
+                Debug.LogWarning("PUSH DIBATALKAN: Objek ini adalah objek challenge dan canPush = false.");
+                return; // Hentikan fungsi jika ini objek challenge & belum boleh mendorong
+            }
+        }
+
         if (!_canCurrentlyPush) return;
 
         if (!_isPushing.Value)
@@ -231,11 +260,19 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
     [ServerRpc]
     private void CmdApplyForce(NetworkObject targetObject, Vector3 force)
     {
-        // Pastikan objeknya ada dan memiliki Rigidbody
+        // Pesan ini akan muncul di console Server/Host jika perintah berhasil diterima.
+        Debug.LogWarning("[Server] CmdApplyForce received. Attempting to apply force.");
+
         if (targetObject != null && targetObject.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            // Terapkan gaya di server. NetworkTransform akan menyinkronkan hasilnya.
+            // Pesan ini akan muncul jika Rigidbody berhasil ditemukan.
+            Debug.LogWarning("[Server] Rigidbody found on " + rb.name + ". Applying force now.");
             rb.AddForce(force, ForceMode.Impulse);
+        }
+        else
+        {
+            // Pesan ini akan muncul jika Rigidbody GAGAL ditemukan.
+            Debug.LogError("[Server] FAILED to find Rigidbody on the target object: " + targetObject.name);
         }
     }
 

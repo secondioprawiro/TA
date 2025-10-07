@@ -16,6 +16,7 @@ public class NetworkedPlayerAndro : NetworkBehaviour
     [SerializeField] private GameObject Joystick;
     [SerializeField] private GameObject UISystem;
 
+    private string myPrediction = "";
 
 
     public override void OnStartClient()
@@ -28,6 +29,34 @@ public class NetworkedPlayerAndro : NetworkBehaviour
         else
         {
             DisableOtherPlayersInput();
+        }
+    }
+
+    public void SetMyPrediction(string choice)
+    {
+        // Hanya player yang memiliki kontrol (IsOwner) yang bisa mengatur prediksinya sendiri
+        if (!base.IsOwner) return;
+
+        myPrediction = choice;
+        Debug.Log("Pilihan saya disimpan: " + myPrediction);
+    }
+
+    public void CheckMyResult(string actualWinner)
+    {
+        // Hanya player yang memiliki kontrol (IsOwner) yang perlu mengecek hasilnya.
+        if (!base.IsOwner) return;
+
+        if (myPrediction == actualWinner)
+        {
+            Debug.Log("Hasil: Prediksi SAYA BENAR!");
+            // Nanti kita akan panggil fungsi di GameManager untuk menampilkan UI "Benar"
+            GameManager.instance.ShowResultPanel(true, actualWinner, myPrediction);
+        }
+        else
+        {
+            Debug.Log("Hasil: Prediksi SAYA SALAH.");
+            // Nanti kita akan panggil fungsi di GameManager untuk menampilkan UI "Salah"
+            GameManager.instance.ShowResultPanel(false, actualWinner, myPrediction);
         }
     }
 

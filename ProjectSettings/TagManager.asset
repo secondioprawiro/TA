@@ -8,6 +8,9 @@ TagManager:
   - SpawnPoint
   - Server
   - SceneChangeButton
+  - SkyboxCamera
+  - PushableCube
+  - PracticeObject
   layers:
   - Default
   - TransparentFX

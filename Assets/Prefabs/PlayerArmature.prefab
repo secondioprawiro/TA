@@ -1665,7 +1665,6 @@ MonoBehaviour:
   - {fileID: 1522849444667639222}
   - {fileID: 8196995671832685076}
   - {fileID: 4918747730675055005}
-  - {fileID: 0}
   - {fileID: 7325119333103094265}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
@@ -1840,10 +1839,11 @@ MonoBehaviour:
   _componentIndexCache: 4
   _addedNetworkObject: {fileID: -5681718616853551831}
   _networkObjectCache: {fileID: -5681718616853551831}
+  canPush: 0
   pushLayers:
     serializedVersion: 2
     m_Bits: 8
-  strength: 0.5
+  strength: 3.5
   pushDistance: 1.5
   thirdPersonController: {fileID: -5666668197102539587}
   mobilePushButton: {fileID: 7768601159665788329}
@@ -4159,7 +4159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 10
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: -5681718616853551831}
   _networkObjectCache: {fileID: -5681718616853551831}
   _componentConfiguration: 0
