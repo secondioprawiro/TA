@@ -53,7 +53,7 @@ public class VRObjectPhysics : NetworkBehaviour
     [ObserversRpc]
     private void ObserversSetKinematic(bool isKinematic)
     {
-        if (base.IsOwner) return;
+        //if (base.IsOwner) return;
         rb.isKinematic = isKinematic;
     }
 }
