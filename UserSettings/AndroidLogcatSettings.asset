@@ -3,7 +3,7 @@
     "m_SelectedProcess": {
         "deviceId": "PA8120MGGA261358G",
         "name": "com.DefaultCompany.MyProject",
-        "processId": 5075,
+        "processId": 4998,
         "exited": false
     },
     "m_SelectedPriority": 1,
@@ -480,6 +480,12 @@
             "deviceId": "PA8120MGGA261358G",
             "name": "com.DefaultCompany.MyProject",
             "processId": 5075,
+            "exited": false
+        },
+        {
+            "deviceId": "PA8120MGGA261358G",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 4998,
             "exited": false
         }
     ],
