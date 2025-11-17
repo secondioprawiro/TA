@@ -116,7 +116,7 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
             _lastSeenRigidbody = hit.collider.GetComponent<InteractiveRigidbody>();
             if (irb != null)
             {
-                //do something
+                Debug.Log("Interactive tidak null");
             }
             else
             {
@@ -146,9 +146,7 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
 
     public void OnPushInteraction()
     {
-        Debug.Log("OnPushInteraction dipanggil."); // Pesan debug untuk konfirmasi
-
-        // --- LOGIKA KONDISIONAL DIMULAI DI SINI ---
+        Debug.Log("OnPushInteraction dipanggil.");
 
         bool isPracticeObject = false;
 
@@ -162,13 +160,12 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
             }
         }
 
-        // Aturan utama: Jika objek ini BUKAN objek latihan, maka aturan canPush berlaku.
         if (!isPracticeObject)
         {
             if (!canPush)
             {
                 Debug.LogWarning("PUSH DIBATALKAN: Objek ini adalah objek challenge dan canPush = false.");
-                return; // Hentikan fungsi jika ini objek challenge & belum boleh mendorong
+                return;
             }
         }
 
@@ -203,7 +200,11 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
 
         if (base.IsOwner && thirdPersonController != null)
         {
-            thirdPersonController.LockRotation(next);
+            bool isPushing = next;
+            
+            thirdPersonController.LockRotation(isPushing);
+
+            thirdPersonController.canJump = !isPushing;
         }
     }
 
