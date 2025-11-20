@@ -1799,6 +1799,7 @@ MonoBehaviour:
     m_Bits: 0
   PushStopDistance: 0.1
   AlignmentDuration: 0.15
+  canJump: 1
   CinemachineCameraTarget: {fileID: 8338988566280778634}
   TopClamp: 70
   BottomClamp: -30
@@ -1843,7 +1844,7 @@ MonoBehaviour:
   pushLayers:
     serializedVersion: 2
     m_Bits: 8
-  strength: 3.5
+  strength: 2
   pushDistance: 1.5
   thirdPersonController: {fileID: -5666668197102539587}
   mobilePushButton: {fileID: 7768601159665788329}

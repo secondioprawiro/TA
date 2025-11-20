@@ -1,9 +1,9 @@
 {
-    "m_SelectedDeviceId": "PA8120MGGA261358G",
+    "m_SelectedDeviceId": "a63f7ecd",
     "m_SelectedProcess": {
-        "deviceId": "PA8120MGGA261358G",
+        "deviceId": "a63f7ecd",
         "name": "com.DefaultCompany.MyProject",
-        "processId": 5008,
+        "processId": 20827,
         "exited": false
     },
     "m_SelectedPriority": 1,
@@ -522,6 +522,12 @@
             "deviceId": "a63f7ecd",
             "name": "com.DefaultCompany.MyProject",
             "processId": 20250,
+            "exited": false
+        },
+        {
+            "deviceId": "a63f7ecd",
+            "name": "com.DefaultCompany.MyProject",
+            "processId": 20827,
             "exited": false
         },
         {

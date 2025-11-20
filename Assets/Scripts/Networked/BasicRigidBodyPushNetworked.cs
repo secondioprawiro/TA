@@ -32,6 +32,9 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
     [Tooltip("Tombol UI untuk mengurangi massa.")]
     public Button decreaseMassButton;
 
+    private float _nextPushTime = 0f;
+    private float _pushCooldown = 0.1f;
+
     //private MassControlPanel massControlPanel;
 
     private NetworkObject networkObject;
@@ -116,11 +119,10 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
             _lastSeenRigidbody = hit.collider.GetComponent<InteractiveRigidbody>();
             if (irb != null)
             {
-                Debug.Log("Interactive tidak null");
+                
             }
             else
             {
-                Debug.LogError("GAGAL menemukan InteractiveRigidbody pada " + hit.collider.name + " atau induknya!");
             }
         }
         else{
@@ -223,12 +225,20 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
 
     private void PushRigidBodies(ControllerColliderHit hit)
     {
+        if (Time.time < _nextPushTime) return;
+
         NetworkObject targetNO = hit.collider.GetComponent<NetworkObject>();
-        if (targetNO == null) return;
+        if (targetNO == null || targetNO.GetComponent<Rigidbody>() == null) return;
 
-        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0.0f, hit.moveDirection.z);
+        Vector3 pushDir = transform.forward;
+        pushDir.y = 0;
+        pushDir.Normalize();
 
-        CmdApplyForce(targetNO, pushDir * strength);
+        Vector3 finalForce = pushDir * strength;
+
+        CmdApplyForce(targetNO, finalForce);
+
+        _nextPushTime = Time.time + _pushCooldown;
     }
     private void HandleMassControlUI()
     {
@@ -268,7 +278,8 @@ public class BasicRigidBodyPushNetworked : NetworkBehaviour
         {
             // Pesan ini akan muncul jika Rigidbody berhasil ditemukan.
             Debug.LogWarning("[Server] Rigidbody found on " + rb.name + ". Applying force now.");
-            rb.AddForce(force, ForceMode.Impulse);
+            rb.isKinematic = false;
+            rb.AddForce(force, ForceMode.VelocityChange);
         }
         else
         {

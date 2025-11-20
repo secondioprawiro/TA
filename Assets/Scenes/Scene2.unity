@@ -5149,7 +5149,7 @@ MonoBehaviour:
     Clue
     :
 
-    F = 3.5 N
+    F = 2 N
 
 
     Rumus:
@@ -8330,8 +8330,8 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 476320097}
   _networkObjectCache: {fileID: 0}
   objectName: OBJEK A
-  minMass: 30
-  maxMass: 30
+  minMass: 15
+  maxMass: 15
   massIncrement: 1
   massDisplayText: {fileID: 1947357927}
 --- !u!54 &476320096
@@ -17329,8 +17329,8 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1113927596}
   _networkObjectCache: {fileID: 0}
   objectName: OBJEK B
-  minMass: 15
-  maxMass: 15
+  minMass: 20
+  maxMass: 20
   massIncrement: 1
   massDisplayText: {fileID: 1485038491}
 --- !u!54 &1113927595
@@ -18470,7 +18470,7 @@ MonoBehaviour:
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _sendToOwner: 1
   _interval: 1
   _synchronizePosition: 1
@@ -18498,8 +18498,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1217112458}
   serializedVersion: 4
-  m_Mass: 15
-  m_Drag: 1.5
+  m_Mass: 30
+  m_Drag: 2
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
