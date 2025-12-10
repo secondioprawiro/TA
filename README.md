@@ -2,7 +2,6 @@
 
 ![Unity](https://img.shields.io/badge/Engine-Unity-black?logo=unity)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Windows-lightgrey)
-![Type](https://img.shields.io/badge/Type-Thesis%20Project-blue)
 
 ## 📌 Tentang Aplikasi
 
